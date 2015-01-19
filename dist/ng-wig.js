@@ -123,6 +123,7 @@ angular.module('ngWig').directive('ngWigEditable', function () {
         //model --> view
         ctrl.$render = function () {
           $body[0].innerHTML = ctrl.$viewValue || '';
+          resizeEditor();
         };
 
         //view --> model
