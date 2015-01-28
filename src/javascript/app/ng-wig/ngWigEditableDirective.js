@@ -44,6 +44,7 @@ angular.module('ngWig').directive('ngWigEditable', function () {
         });
 
         function resizeEditor() {
+          // return;
           if (!scope.autoexpand) {
             var height = scope.originalHeight;
           } else {
