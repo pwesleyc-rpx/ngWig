@@ -53,6 +53,7 @@
     display: inline-block;
     vertical-align: top;
     border-right: 1px solid #DEDEDE;
+    border-bottom: 1px solid #E5E8E7;
   }
 
   .nw-toolbar label {
@@ -100,6 +101,10 @@
  *    &--{button type}
  *
  */
+button.nw-button:active {
+  color: grey;
+}
+
 button.nw-button {
   -webkit-appearance: none;
   -moz-appearance:    none;
@@ -204,3 +209,16 @@ button.nw-button {
   .nw-content italic {
     font-style: italic;
   }
+
+
+.huge {
+  font-size: 1.3em;
+}
+
+.medium {
+  font-size: 1em;
+}
+
+.small {
+  font-size: 0.8em;
+}

@@ -87,8 +87,10 @@ angular.module('ngWig').directive('ngWig', function () {
           };
 
           scope.execCommand = function (command, options) {
-            if(command ==='createlink'){
+            if(command ==='createlink' || command === 'insertImage'){
               options = prompt('Please enter the URL', 'http://');
+              if(options === null || options.length === 0)
+                return;
             }
             scope.$emit('execCommand', {command: command, options: options});
           };
@@ -115,7 +117,9 @@ angular.module('ngWig').directive('ngWigEditable', function () {
         var $document = $element[0].contentDocument,
             $body;
         $document.open();
-        $document.write('<!DOCTYPE html><html><head>'+ (scope.cssPath ? ('<link href="'+ scope.cssPath +'" rel="stylesheet" type="text/css">') : '') + '</head><body contenteditable="true"></body></html>');
+        $document.write('<!DOCTYPE html><html style="height: 100%"><head>'+ 
+          (scope.cssPath ? ('<link href="'+ scope.cssPath +'" rel="stylesheet" type="text/css">') : '') 
+          + '</head><body style="height: calc(100% - 20px); margin: 10px; cursor: text;" contenteditable="true"></body></html>');
         $document.close();
 
         $body = angular.element($element[0].contentDocument.body);
@@ -189,28 +193,76 @@ angular.module("ng-wig/views/ng-wig.html", []).run(["$templateCache", function($
     "<div class=\"ng-wig\">\n" +
     "  <ul class=\"nw-toolbar\">\n" +
     "    <li class=\"nw-toolbar__item\">\n" +
-    "      <button type=\"button\" class=\"nw-button nw-button--header-one\" title=\"Header\" ng-click=\"execCommand('formatblock', '<h1>')\"></button>\n" +
+    "      <button type=\"button\" class=\"nw-button\" title=\"Header\" ng-click=\"execCommand('formatblock', '<h1>')\"><i class='fa fa-header'></i></button>\n" +
     "    </li><!--\n" +
     "    --><li class=\"nw-toolbar__item\">\n" +
-    "      <button type=\"button\" class=\"nw-button nw-button--paragraph\" title=\"Paragraph\" ng-click=\"execCommand('formatblock', '<p>')\"></button>\n" +
+    "      <button type=\"button\" class=\"nw-button \" title=\"Huge text\" ng-click=\"execCommand('fontSize', 7)\"><i class='fa fa-text-height huge'></i></button>\n" +
     "    </li><!--\n" +
     "    --><li class=\"nw-toolbar__item\">\n" +
-    "      <button type=\"button\" class=\"nw-button nw-button--unordered-list\" title=\"Unordered List\" ng-click=\"execCommand('insertunorderedlist')\"></button>\n" +
+    "      <button type=\"button\" class=\"nw-button \" title=\"Medium text\" ng-click=\"execCommand('fontSize', 5)\"><i class='fa fa-text-height medium'></i></button>\n" +
     "    </li><!--\n" +
     "    --><li class=\"nw-toolbar__item\">\n" +
-    "      <button type=\"button\" class=\"nw-button nw-button--ordered-list\" title=\"Ordered List\" ng-click=\"execCommand('insertorderedlist')\"></button>\n" +
+    "      <button type=\"button\" class=\"nw-button \" title=\"Small text\" ng-click=\"execCommand('fontSize', 1)\"><i class='fa fa-text-height small'></i></button>\n" +
     "    </li><!--\n" +
     "    --><li class=\"nw-toolbar__item\">\n" +
-    "      <button type=\"button\" class=\"nw-button nw-button--bold\" title=\"Bold\" ng-click=\"execCommand('bold')\"></button>\n" +
+    "      <button type=\"button\" class=\"nw-button \" title=\"Unordered List\" ng-click=\"execCommand('insertunorderedlist')\"><i class='fa fa-list-ul'></i></button>\n" +
     "    </li><!--\n" +
     "    --><li class=\"nw-toolbar__item\">\n" +
-    "      <button type=\"button\" class=\"nw-button nw-button--italic\" title=\"Italic\" ng-click=\"execCommand('italic')\"></button>\n" +
+    "      <button type=\"button\" class=\"nw-button \" title=\"Ordered List\" ng-click=\"execCommand('insertorderedlist')\"><i class='fa fa-list-ol'></i></button>\n" +
     "    </li><!--\n" +
     "    --><li class=\"nw-toolbar__item\">\n" +
-    "      <button type=\"button\" class=\"nw-button nw-button--link\" title=\"link\" ng-click=\"execCommand('createlink')\"></button>\n" +
+    "      <button type=\"button\" class=\"nw-button\" title=\"Bold\" ng-click=\"execCommand('bold')\"><i class='fa fa-bold'></i></button>\n" +
     "    </li><!--\n" +
     "    --><li class=\"nw-toolbar__item\">\n" +
-    "      <button type=\"button\" class=\"nw-button nw-button--source\" ng-class=\"{ 'nw-button--active': editMode }\" ng-click=\"toggleEditMode()\"></button>\n" +
+    "      <button type=\"button\" class=\"nw-button\" title=\"Italic\" ng-click=\"execCommand('italic')\"><i class='fa fa-italic'></i></button>\n" +
+    "    </li><!--\n" +
+    "    --><li class=\"nw-toolbar__item\">\n" +
+    "      <button type=\"button\" class=\"nw-button \" title=\"Underline\" ng-click=\"execCommand('underline')\"><i class='fa fa-underline'></i></button>\n" +
+    "    </li><!--\n" +
+    "    --><li class=\"nw-toolbar__item\">\n" +
+    "      <button type=\"button\" class=\"nw-button \" title=\"Strike through\" ng-click=\"execCommand('strikeThrough')\"><i class='fa fa-strikethrough'></i></button>\n" +
+    "    </li><!--\n" +
+    "    --><li class=\"nw-toolbar__item\">\n" +
+    "      <button type=\"button\" class=\"nw-button \" title=\"Undo\" ng-click=\"execCommand('undo')\"><i class='fa fa-undo'></i></button>\n" +
+    "    </li><!--\n" +
+    "    --><li class=\"nw-toolbar__item\">\n" +
+    "      <button type=\"button\" class=\"nw-button \" title=\"Redo\" ng-click=\"execCommand('redo')\"><i class='fa fa-repeat'></i></button>\n" +
+    "    </li><!--\n" +
+    "    --><li class=\"nw-toolbar__item\">\n" +
+    "      <button type=\"button\" class=\"nw-button \" title=\"Justify left\" ng-click=\"execCommand('justifyLeft')\"><i class='fa fa-align-left'></i></button>\n" +
+    "    </li><!--\n" +
+    "    --><li class=\"nw-toolbar__item\">\n" +
+    "      <button type=\"button\" class=\"nw-button \" title=\"Justify center\" ng-click=\"execCommand('justifyCenter')\"><i class='fa fa-align-center'></i></button>\n" +
+    "    </li><!--\n" +
+    "    --><li class=\"nw-toolbar__item\">\n" +
+    "      <button type=\"button\" class=\"nw-button \" title=\"Justify right\" ng-click=\"execCommand('justifyRight')\"><i class='fa fa-align-right'></i></button>\n" +
+    "    </li><!--\n" +
+    "    --><li class=\"nw-toolbar__item\">\n" +
+    "      <button type=\"button\" class=\"nw-button \" title=\"Justify full\" ng-click=\"execCommand('justifyFull')\"><i class='fa fa-align-justify'></i></button>\n" +
+    "    </li><!--\n" +
+    "    --><li class=\"nw-toolbar__item\">\n" +
+    "      <button type=\"button\" class=\"nw-button \" title=\"Indent\" ng-click=\"execCommand('indent')\"><i class='fa fa-indent'></i></button>\n" +
+    "    </li><!--\n" +
+    "    --><li class=\"nw-toolbar__item\">\n" +
+    "      <button type=\"button\" class=\"nw-button \" title=\"Outdent\" ng-click=\"execCommand('outdent')\"><i class='fa fa-outdent'></i></button>\n" +
+    "    </li><!--\n" +
+    "    --><li class=\"nw-toolbar__item\">\n" +
+    "      <button type=\"button\" class=\"nw-button \" title=\"Subscript\" ng-click=\"execCommand('subscript')\"><i class='fa fa-subscript'></i></button>\n" +
+    "    </li><!--\n" +
+    "    --><li class=\"nw-toolbar__item\">\n" +
+    "      <button type=\"button\" class=\"nw-button \" title=\"Superscript\" ng-click=\"execCommand('superscript')\"><i class='fa fa-superscript'></i></button>\n" +
+    "    </li><!--\n" +
+    "    --><li class=\"nw-toolbar__item\">\n" +
+    "      <button type=\"button\" class=\"nw-button\" title=\"link\" ng-click=\"execCommand('createlink')\"><i class='fa fa-link'></i></button>\n" +
+    "    </li><!--\n" +
+    "    --><li class=\"nw-toolbar__item\">\n" +
+    "      <button type=\"button\" class=\"nw-button\" title=\"unlink\" ng-click=\"execCommand('unlink')\"><i class='fa fa-unlink'></i></button>\n" +
+    "    </li><!--\n" +
+    "    --><li class=\"nw-toolbar__item\">\n" +
+    "      <button type=\"button\" class=\"nw-button\" title=\"Image\" ng-click=\"execCommand('insertImage')\"><i class='fa fa-image'></i></button>\n" +
+    "    </li><!--\n" +
+    "    --><li class=\"nw-toolbar__item\">\n" +
+    "      <button type=\"button\" class=\"nw-button\" title=\"remove format selection\" ng-click=\"execCommand('removeFormat', false, '')\"><i class='fa fa-ban'></i></button>\n" +
     "    </li>\n" +
     "  </ul>\n" +
     "\n" +
